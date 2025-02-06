@@ -4,7 +4,7 @@ import './App.css'
 import { StreamChat } from "stream-chat";
 import { ChannelList, Chat, Channel, ChannelHeader, MessageInput, MessageList, Thread, Window } from 'stream-chat-react';
 import 'stream-chat-react/dist/css/v2/index.css';
-
+import { EmojiPicker } from "stream-chat-react/emojis";
 function App() {
   const [client, setclient] = useState(null)
   const [channel, setChannel] = useState(null);
@@ -21,32 +21,42 @@ function App() {
         chatclient.devToken("james"),
       );
 
-      const channel = chatclient.channel("messaging", "travel", {
-        name: "Awesome channel about traveling",
-        members: ["james"],
-      });
-      await channel.watch();
+      // const channel = chatclient.channel("messaging", "travel", {
+      //   name: "Awesome channel about traveling",
+      //   members: ["james"],
+      // });
+      // await channel.watch();
 
       setChannel(channel);
       setclient(chatclient);
     }
     connect();
 
-    if (client ) return () => {
+    if (client) return () => {
       client.disconnect();
     }
   }, [])
+
+  const filters = {
+    members: {
+      $in: [
+        "james",
+      ]
+    }, type: "messaging"
+  };
+  const options = { presence: true, state: true };
+  const sort = { last_message_at: -1 };
 
   if (!client) {
     return <div>Loading...</div>
   }
   return (
     <Chat client={client}>
-      <ChannelList  />
-      <Channel>
+      <ChannelList sort={sort} filters={filters} options={options} />
+      <Channel EmojiPicker={EmojiPicker}>
         <Window>
           <ChannelHeader />
-          <MessageList />
+          <MessageList  />
           <MessageInput />
         </Window>
         <Thread />
